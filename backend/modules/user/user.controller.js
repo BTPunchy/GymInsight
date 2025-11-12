@@ -1,4 +1,5 @@
 const userService = require("./user.service");
+const bcrypt = require('bcrypt');
 const register = async (req, res) => {
     const {userName, fName, lName, password, age, height, weight, diseases, sex, BMI} = req.body;
     try {
@@ -37,8 +38,30 @@ const updatesUser = async (req, res) => {
     }
  };
 
+const loginUser = async (req, res) => {
+    try{
+        const { userName, password } = req.body;
+
+        if (!userName || !password) {
+        return res.status(400).json({ success: false, message: err.message });
+        }
+
+        const result = await userService.loginUserService(userName, password);
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            data: result
+            }
+        );
+    } catch(err){
+        return res.status(401).json({ success: false, message: err.message });
+    }
+}
+
 module.exports = {
     register,
     deleteUser,
-    updatesUser
+    updatesUser,
+    loginUser
 }

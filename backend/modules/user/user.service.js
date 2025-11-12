@@ -1,30 +1,46 @@
 const userModel = require("./user.model");
 
-const registerService = (userName, fName, lName, password, age, height, weight, diseases, sex, BMI) => {
-    try{
-        const existingUser = userModel.getUser(userName);
-        if(existingUser){
-            throw new Error("User already exists");
-        }
-        
-        if(userName == undefined || fName == undefined || lName == undefined ||
-            password == undefined || age == undefined || height == undefined || weight == undefined ||
-        sex == undefined || BMI == undefined){
-            throw new Error("Please fill in all required fields except diseases");
-        }
+const bcrypt = require('bcrypt');
 
-        if ( isNaN(age) || age <= 0||
-        isNaN(height) || height <= 0 ||
-        isNaN(weight) || weight <= 0  ||
-        isNaN(BMI) || BMI <= 0
+const registerService = async (userName, fName, lName, password, age, height, weight, diseases, sex, BMI) => {
+  try {
+    const existingUser = await new Promise((resolve, reject) => {
+      userModel.getUser(userName, (err, user) => {
+        if (err) return reject(err);
+        resolve(user);
+      });
+    });
 
-    ){
-        throw new Error("Age, height, and weight must be valid positive numbers");
+    if (existingUser) {
+      throw new Error("User already exists");
     }
-    return userModel.createUser(userName, fName, lName, password, age, height, weight, diseases, sex, BMI || null);
-    }catch(err){
-        throw new Error(err.message);
+
+    if (
+      !userName || !fName || !lName || !password ||
+      !age || !height || !weight || !sex || !BMI
+    ) {
+      throw new Error("Please fill in all required fields except diseases");
     }
+    
+    if (
+      isNaN(age) || age <= 0 ||
+      isNaN(height) || height <= 0 ||
+      isNaN(weight) || weight <= 0 ||
+      isNaN(BMI) || BMI <= 0
+    ) {
+      throw new Error("Age, height, weight, and BMI must be valid positive numbers");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    return await userModel.createUser(
+      userName, fName, lName, hashedPassword,
+      age, height, weight, diseases || null, sex, BMI
+    );
+
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
 const deleteUserService = (userName) => {
@@ -74,8 +90,24 @@ const updatesUserService = (userName, updates) => {
   });
 };
 
+const loginUserService = (userName, password) => {
+  return new Promise((resolve, reject) => {
+    userModel.getUser(userName, (err, existingUser) => {
+      if(err) return reject(err);
+      if(!existingUser) return reject(new Error("User not found"));
+      
+      if (!bcrypt.compareSync(password, existingUser.password)) {
+        return reject(new Error("Incorrect password"));
+      }
+
+      resolve(existingUser);
+    });
+  });
+};
+
 module.exports = {
     registerService, 
     deleteUserService,
-    updatesUserService
+    updatesUserService,
+    loginUserService
 }
