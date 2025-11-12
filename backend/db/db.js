@@ -33,6 +33,27 @@ CREATE TABLE IF NOT EXISTS trainers (
   FOREIGN KEY (user_id) REFERENCES users(id)
   );
 
+CREATE TABLE IF NOT EXISTS rooms (
+  rid INT PRIMARY KEY AUTO_INCREMENT,
+  description TEXT NOT NULL,
+  room_type VARCHAR(50) NOT NULL,
+  gender_type ENUM('male', 'female', 'unspecified') DEFAULT 'unspecified',
+  status ENUM('available', 'occupied', 'maintenace') NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS booking(
+  booking_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  rid INT,
+  trainer_id INT,
+  date DATE NOT NULL,
+  time_start TIME NOT NULL,
+  time_end TIME NOT NULL,
+  status ENUM('Pending', 'comfirm', 'cancelled') DEFAULT 'pending',
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (rid) REFERENCES rooms(rid),
+  FOREIGN KEY (trainer_id) REFERENCES trainers(id)
+);
 `;
 
 
