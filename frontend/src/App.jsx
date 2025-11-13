@@ -1,11 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import FirstPage from "./pages/firstPage.jsx";
+import Home from "./pages/home.jsx";
+import SignUp from "./pages/signup.jsx";
+import Signin from "./pages/signin.jsx";
+import Services from "./pages/services.jsx";
+import RoomReservation from "./pages/roomReservation.jsx";
+import TrainerSelection from "./pages/trainer.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<FirstPage />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/rooms" element={<RoomReservation />} />
+        <Route path="/service" element={<Services />} />
+        <Route path="/trainer" element={<TrainerSelection />} />
       </Routes>
     </Router>
   );
