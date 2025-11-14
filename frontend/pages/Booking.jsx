@@ -1,33 +1,100 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+
 export default function Booking() {
-  const bookings = [
-    {
-      id: 'BK-001',
-      room: 'Yoga Room',
-      date: '2025-11-15',
-      time: '09:00 - 10:00',
-      status: 'Upcoming',
-    },
-    {
-      id: 'BK-002',
-      room: 'Pilates Room',
-      date: '2025-11-10',
-      time: '18:00 - 19:00',
-      status: 'Completed',
-    },
-    {
-      id: 'BK-003',
-      room: 'Dance Fitness',
-      date: '2025-11-12',
-      time: '19:00 - 20:00',
-      status: 'Cancelled',
-    },
-  ]
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const userName = localStorage.getItem("userName");
+
+    async function fetchUserData() {
+      try {
+        // 🔹 Get user ID
+        const res = await axios.get(`http://localhost:1234/users/${userName}`);
+        const id = res.data.id;
+        setUserId(id);
+
+        // 🔹 Get bookings for this user
+        const bookingsRes = await axios.get(
+          `http://localhost:1234/rooms/bookings/user/${id}`
+        );
+        const rawBookings = bookingsRes.data.data;
+
+        // 🔹 Fetch room details for each booking
+        const roomMap = {};
+        for (const booking of rawBookings) {
+          const rid = booking.rid;
+          if (!roomMap[rid]) {
+            const roomRes = await axios.get(
+              `http://localhost:1234/rooms/user/${rid}`
+            );
+            const roomData = roomRes.data.data;
+
+            const room = Array.isArray(roomData) ? roomData[0] : roomData;
+
+            roomMap[rid] = {
+              type: room.room_type,
+              name: room.description,
+            };
+          }
+        }
+
+        // 🔹 Merge room info into bookings
+        const bookingsWithRoomInfo = rawBookings.map((booking) => ({
+          ...booking,
+          roomType: mapRoomType(roomMap[booking.rid]?.type),
+          roomName: roomMap[booking.rid]?.name || `Room ${booking.rid}`,
+        }));
+
+        setBookings(bookingsWithRoomInfo);
+      } catch (err) {
+        console.error("Error fetching user or bookings:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUserData();
+  }, []);
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  function cancelBooking(bookingId) {
+    axios
+      .delete(`http://localhost:1234/rooms/bookings/${bookingId}`)
+      .then(() => {
+        const updatedBookings = bookings.filter(
+          (b) => b.booking_id !== bookingId
+        );
+        setBookings(updatedBookings);
+      })
+      .catch((err) => {
+        console.error("Error cancelling booking:", err);
+      });
+  }
+  function mapRoomType(type) {
+    const map = {
+      yoga: "Yoga",
+      pilates: "Pilates",
+      dance: "Dance",
+    };
+    return map[type] || "Unknown";
+  }
 
   return (
     <div className="page">
       <div className="page-header">
         <h1>Booking</h1>
-        <p>Track and manage all of your room reservations in one place.</p>
+        <p>Track and manage all your room reservations in one place.</p>
       </div>
 
       <div className="pill-tabs">
@@ -46,42 +113,49 @@ export default function Booking() {
       </div>
 
       <div className="card surface">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Booking ID</th>
-              <th>Room</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Status</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id}>
-                <td>{b.id}</td>
-                <td>{b.room}</td>
-                <td>{b.date}</td>
-                <td>{b.time}</td>
-                <td>
-                  <span className={`badge badge-${b.status.toLowerCase()}`}>
-                    {b.status}
-                  </span>
-                </td>
-                <td className="table-actions">
-                  <button type="button" className="btn-xs">
-                    View
-                  </button>
-                  <button type="button" className="btn-xs ghost">
-                    Cancel
-                  </button>
-                </td>
+        {loading ? (
+          <p>Loading bookings...</p>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Room Name</th>
+                <th>Room Type</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {bookings.map((b) => (
+                <tr key={b.booking_id}>
+                  <td>{b.booking_id}</td>
+                  <td>{b.roomName}</td>
+                  <td>{b.roomType}</td>
+                  <td>{formatDate(b.date)}</td>
+                  <td>{b.time_slot}</td>
+                  <td>
+                    <span className={`badge badge-${b.status.toLowerCase()}`}>
+                      {b.status}
+                    </span>
+                  </td>
+                  <td className="table-actions">
+                    <button
+                      type="button"
+                      className="btn-xs ghost btn-red"
+                      onClick={() => cancelBooking(b.booking_id)}
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
-  )
+  );
 }

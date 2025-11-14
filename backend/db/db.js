@@ -41,46 +41,31 @@ CREATE TABLE IF NOT EXISTS rooms (
   status ENUM('available', 'occupied', 'maintenance') NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS time_slots (
-  slot_id INT PRIMARY KEY AUTO_INCREMENT,
-  time_start TIME NOT NULL,
-  time_end TIME NOT NULL
-);
-
-INSERT INTO time_slots (time_start, time_end) VALUES
-('07:00:00', '08:30:00'),
-('09:00:00', '10:30:00'),
-('11:30:00', '13:00:00'),
-('14:00:00', '15:30:00'),
-('16:30:00', '17:30:00'),
-('18:00:00', '19:30:00');
-
 CREATE TABLE IF NOT EXISTS booking (
   booking_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   rid INT,
   trainer_id INT,
   date DATE NOT NULL,
-  slot_id INT NOT NULL,
+  time_slot ENUM('08:00:00-10:30:00', '11:30:00-13:00:00', 
+  '14:00:00-16:30:00', '17:00:00-19:30:00', '20:00:00-22:30:00') NOT NULL,
   status ENUM('pending', 'confirm', 'cancelled') DEFAULT 'pending',
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (rid) REFERENCES rooms(rid),
-  FOREIGN KEY (trainer_id) REFERENCES trainers(id),
-  FOREIGN KEY (slot_id) REFERENCES time_slots(slot_id)
+  FOREIGN KEY (trainer_id) REFERENCES trainers(id)
 );
 
 INSERT INTO rooms (description, room_type, gender_type, status) VALUES
 ('Peaceful yoga space with natural light', 'yoga', 'female', 'available'),
 ('Pilates room with reformer machines', 'pilates', 'unspecified', 'available'),
 ('Dance studio with mirrors and sound system', 'dance', 'male', 'available');
-`
-
+`;
 
 db.connect((err) => {
+  if (err) throw err;
+  db.query(initSQL, (err) => {
     if (err) throw err;
-    db.query(initSQL, (err) => {
-      if (err) throw err;
-      console.log(" Database and tables initialized");
-    });
+    console.log(" Database and tables initialized");
   });
+});
 module.exports = db;

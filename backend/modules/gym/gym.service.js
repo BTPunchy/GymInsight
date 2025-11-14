@@ -1,8 +1,24 @@
 const gymModel = require("../gym/gym.model");
 
-const createBookingRoomsService = async (user_id, rid, trainer_id, date, time_start, time_end, status) => {
+const createBookingRoomsService = async (
+  user_id,
+  rid,
+  trainer_id,
+  date,
+  time_start,
+  time_end,
+  status
+) => {
   try {
-    const result = await gymModel.createBookingRooms(user_id, rid, trainer_id, date, time_start, time_end, status);
+    const result = await gymModel.createBookingRooms(
+      user_id,
+      rid,
+      trainer_id,
+      date,
+      time_start,
+      time_end,
+      status
+    );
     return result;
   } catch (err) {
     throw err;
@@ -13,10 +29,19 @@ const getRoomService = async () => {
   return await gymModel.getRooms();
 };
 
-const getRoomByUserService = async (user_id) => {
+const getBookingByUserService = async (user_id) => {
   try {
-    const bookings = await gymModel.getRoomByUser(user_id);
+    const bookings = await gymModel.getBookingByUser(user_id);
     return bookings;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getRoomByIDService = async (user_id) => {
+  try {
+    const room = await gymModel.getRoomByID(user_id);
+    return room;
   } catch (err) {
     throw err;
   }
@@ -41,9 +66,10 @@ const deleteBookingRoomsService = async (booking_id) => {
 };
 
 module.exports = {
-    createBookingRoomsService,
-    getRoomByUserService,
-    getRoomService,
-    updatedBookingRoomStatusService,
-    deleteBookingRoomsService,
-}
+  createBookingRoomsService,
+  getBookingByUserService,
+  getRoomService,
+  updatedBookingRoomStatusService,
+  deleteBookingRoomsService,
+  getRoomByIDService,
+};

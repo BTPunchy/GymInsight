@@ -38,20 +38,19 @@ export default function Navbar() {
           <Link className={isActive("/")} to="/">
             Home
           </Link>
-          <a className="link" href="#service">
-            Service
-          </a>
+          <Link className={isActive("/")} to="/">
+            <a className="link" href="#service">
+              Service
+            </a>
+          </Link>
+
           <Link className={isActive("/booking")} to="/booking">
             Booking
           </Link>
-          {/* <Link
-            className={
-              pathname.startsWith("/trainers") ? "link active" : "link"
-            }
-            to="/trainers"
-          >
-            Trainer
-          </Link> */}
+
+          <Link className={isActive("/reserve")} to="/reserve">
+            Reserve
+          </Link>
 
           {userData ? (
             <>

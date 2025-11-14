@@ -3,20 +3,34 @@ const { createRoom } = require("./gym.model");
 
 const createBookingRooms = async (req, res) => {
   try {
-    const { user_id, rid, trainer_id, date, time_start, time_end, status } = req.body;
+    const { user_id, rid, trainer_id, date, time_start, time_end, status } =
+      req.body;
 
     if (!user_id || !date || !time_start || !time_end) {
-      return res.status(400).json({success: false, message: "Missing required fields: user_id, date, time_start, or time_end"});
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields: user_id, date, time_start, or time_end",
+      });
     }
 
     const result = await gymService.createBookingRoomsService(
-      user_id, rid, trainer_id,
-      date, time_start, time_end, status
+      user_id,
+      rid,
+      trainer_id,
+      date,
+      time_start,
+      time_end,
+      status
     );
 
-    res.status(201).json({success: true, message: "Booking created successfully", data: result});
+    res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message});
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -30,21 +44,32 @@ const getRooms = async (req, res) => {
   }
 };
 
-const getRoomByUser = async (req, res) => {
+const getBookingByUser = async (req, res) => {
   try {
     const { user_id } = req.params;
 
     if (!user_id) {
-      return res.status(400).json({ success: false, message: "Missing user_id" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing user_id" });
     }
 
-    const bookings = await gymService.getRoomByUserService(user_id);
+    const bookings = await gymService.getBookingByUserService(user_id);
     res.status(200).json({ success: true, data: bookings });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
+const getRoomByID = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const room = await gymService.getRoomByIDService(user_id);
+    res.status(200).json({ success: true, data: room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
 const updatedBookingRoomStatus = async (req, res) => {
   try {
@@ -54,25 +79,27 @@ const updatedBookingRoomStatus = async (req, res) => {
     if (!status) {
       return res.status(400).json({
         success: false,
-        message: "Missing status field"
+        message: "Missing status field",
       });
     }
 
-    const result = await gymService.updatedBookingRoomStatusService(booking_id, status);
+    const result = await gymService.updatedBookingRoomStatusService(
+      booking_id,
+      status
+    );
 
     res.status(200).json({
       success: true,
       message: "Booking status updated successfully",
-      data: result
+      data: result,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
-
 
 const deleteBookingRooms = async (req, res) => {
   try {
@@ -81,7 +108,7 @@ const deleteBookingRooms = async (req, res) => {
     if (!booking_id) {
       return res.status(400).json({
         success: false,
-        message: "Missing booking_id"
+        message: "Missing booking_id",
       });
     }
 
@@ -90,12 +117,12 @@ const deleteBookingRooms = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Booking deleted successfully",
-      data: result
+      data: result,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -103,7 +130,8 @@ const deleteBookingRooms = async (req, res) => {
 module.exports = {
   getRooms,
   createBookingRooms,
-  getRoomByUser,
+  getBookingByUser,
   updatedBookingRoomStatus,
-  deleteBookingRooms
+  deleteBookingRooms,
+  getRoomByID,
 };
