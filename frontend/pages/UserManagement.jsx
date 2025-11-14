@@ -20,13 +20,25 @@ export default function UserManagement() {
   const userName = localStorage.getItem("userName");
   const hiddenFields = ["id", "password"];
 
+  const fieldLabels = {
+    userName: "Username",
+    fName: "First Name",
+    lName: "Last Name",
+    age: "Age",
+    height: "Height (cm)",
+    weight: "Weight (kg)",
+    diseases: "Medical Conditions",
+    sex: "Gender",
+    BMI: "BMI",
+  };
+
   useEffect(() => {
     if (userName) {
       axios
         .get(`http://localhost:1234/users/${userName}`)
         .then((res) => {
           setProfile(res.data);
-          setDraft({ ...res.data }); // important: clone
+          setDraft({ ...res.data });
         })
         .catch((err) => {
           console.error("Failed to fetch user:", err);
@@ -35,7 +47,7 @@ export default function UserManagement() {
   }, [userName]);
 
   const handleStartEdit = () => {
-    setDraft({ ...profile }); // clone
+    setDraft({ ...profile });
     setIsEditing(true);
   };
 
@@ -53,11 +65,9 @@ export default function UserManagement() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-
     try {
       await axios.put(`http://localhost:1234/users/${userName}`, draft);
-
-      setProfile({ ...draft }); // update UI
+      setProfile({ ...draft });
       setIsEditing(false);
     } catch (err) {
       console.error("Update failed:", err);
@@ -79,7 +89,9 @@ export default function UserManagement() {
               .filter(([key]) => !hiddenFields.includes(key))
               .map(([key, value]) => (
                 <div className="profile-row" key={key}>
-                  <span className="profile-label">{key}</span>
+                  <span className="profile-label">
+                    {fieldLabels[key] || key}
+                  </span>
                   <span className="profile-value">{value}</span>
                 </div>
               ))}
@@ -97,7 +109,7 @@ export default function UserManagement() {
               .map(([key, value]) => (
                 <div className="profile-row" key={key}>
                   <label className="profile-label" htmlFor={key}>
-                    {key}
+                    {fieldLabels[key] || key}
                   </label>
 
                   {key === "sex" ? (
@@ -108,9 +120,15 @@ export default function UserManagement() {
                       onChange={handleChange}
                       className="input"
                     >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="male" className="text-black">
+                        male
+                      </option>
+                      <option value="female" className="text-black">
+                        female
+                      </option>
+                      <option value="other" className="text-black">
+                        other
+                      </option>
                     </select>
                   ) : (
                     <input
