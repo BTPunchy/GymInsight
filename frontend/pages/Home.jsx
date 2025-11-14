@@ -27,12 +27,28 @@ export default function Home() {
 
   const selectedService = SERVICE_ITEMS.find((s) => s.id === activeService);
 
-  const handleBookNow = () => {
-    // ตอนนี้ให้แค่ mock ไว้ก่อน เผื่อเดี๋ยวไปต่อกับ backend
-    alert(
-      `Booked ${selectedService.title} at ${activeTime} (mock UI – ไว้ต่อ backend ทีหลัง)`
-    );
-  };
+const handleBookNow = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/users", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ serviceId: activeService, time: activeTime }),
+})
+
+
+    const data = await res.json();
+    if (data.success) {
+      alert(`Booked ${selectedService.title} at ${activeTime}. ID: ${data.bookingId}`);
+    } else {
+      alert("Booking failed: " + data.message);
+    }
+  } catch (err) {
+    console.error("Frontend fetch error:", err);
+    alert("Network or server error");
+  }
+};
+
+
 
   return (
     <div className="home">
