@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../components/header";
+import danceImgae from "../assets/Dance.jpg"
 
 export default function RoomReservation() {
   const [name, setName] = useState("");
@@ -29,7 +30,7 @@ export default function RoomReservation() {
     },
     {
       title: "DANCE FITNESS ROOM",
-      image: "/images/dance-room.jpg",
+      image: "DanceImage",
       slug: "dance",
     },
   ];

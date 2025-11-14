@@ -10,7 +10,7 @@ export function RoomInfo() {
         "A calming space with soft lighting, yoga mats, cushions, and plants. Perfect for mindfulness and flexibility training.",
       image: "/images/yoga-room.jpg",
     },
-    pirates: {
+    pilates: {
       title: "Pilates Room",
       description:
         "Modern pilates reformer machines, clean design, and supportive atmosphere for core strength and posture.",
