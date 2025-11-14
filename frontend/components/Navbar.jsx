@@ -1,9 +1,33 @@
-import { Link, useLocation } from 'react-router-dom'
+import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const { pathname } = useLocation()
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const username = localStorage.getItem("userName");
 
-  const isActive = (path) => (pathname === path ? 'link active' : 'link')
+  useEffect(() => {
+    if (!username) return;
+
+    axios
+      .get(`http://localhost:1234/users/${username}`)
+      .then((res) => {
+        setUserData(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+      });
+  }, [username]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userName");
+    setUserData(null);
+    navigate("/signin");
+  };
+
+  const isActive = (path) => (pathname === path ? "link active" : "link");
 
   return (
     <header className="nav">
@@ -11,42 +35,55 @@ export default function Navbar() {
         <div className="brand">FitQuery</div>
 
         <nav className="nav-links">
-          <Link className={isActive('/')} to="/">
+          <Link className={isActive("/")} to="/">
             Home
           </Link>
-
           <a className="link" href="#service">
             Service
           </a>
-
-          <Link className={isActive('/booking')} to="/booking">
+          <Link className={isActive("/booking")} to="/booking">
             Booking
           </Link>
-
-          <Link className={pathname.startsWith('/trainers') ? 'link active' : 'link'} to="/trainers">
+          <Link
+            className={
+              pathname.startsWith("/trainers") ? "link active" : "link"
+            }
+            to="/trainers"
+          >
             Trainer
           </Link>
 
-          {/* ถ้าอยากให้ Users เหมือนเมนู admin ก็แปะไว้ตรงนี้ก่อน */}
-          <Link className={isActive('/users')} to="/users">
-            Users
-          </Link>
+          {userData ? (
+            <>
+              <Link className="link" to="/users">
+                👤 {userData.fName + " " + userData.lName}
+              </Link>
 
-          <Link
-            className={pathname === '/signin' ? 'btn outline active' : 'btn outline'}
-            to="/signin"
-          >
-            Sign In
-          </Link>
-
-          <Link
-            className="btn solid"
-            to="/signup"
-          >
-            Sign Up
-          </Link>
+              <button
+                onClick={handleLogout}
+                className="btn outline ml-2"
+                style={{ marginLeft: "1rem" }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                className={
+                  pathname === "/signin" ? "btn outline active" : "btn outline"
+                }
+                to="/signin"
+              >
+                Sign In
+              </Link>
+              <Link className="btn solid" to="/signup">
+                Sign Up
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>
-  )
+  );
 }

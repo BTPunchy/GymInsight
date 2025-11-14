@@ -1,31 +1,69 @@
 const db = require("../../db/db");
-const createUser = (userName, fName, lName, password, age, height, weight, diseases, sex, BMI) => {
-    db.query("INSERT INTO users (userName, fName, lName, password, age, height, weight, diseases, sex, BMI) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-    userName, fName, lName, password, age,
-    height, weight, diseases, sex, BMI
-  ]);
-  return { id: db.insertId, userName, fName, lName, password, age, height, weight, diseases};
+const createUser = (
+  userName,
+  fName,
+  lName,
+  password,
+  age,
+  height,
+  weight,
+  diseases,
+  sex,
+  BMI
+) => {
+  db.query(
+    "INSERT INTO users (userName, fName, lName, password, age, height, weight, diseases, sex, BMI) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [userName, fName, lName, password, age, height, weight, diseases, sex, BMI]
+  );
+  return {
+    id: db.insertId,
+    userName,
+    fName,
+    lName,
+    password,
+    age,
+    height,
+    weight,
+    diseases,
+  };
 };
 
 const deleteUser = (userName, callback) => {
-    db.query("DELETE FROM users WHERE userName = ?", [userName], (err, result) => {
-        if (err) return callback(err, null);
-        callback(null, result); // มี result.affectedRows
-    });
+  db.query(
+    "DELETE FROM users WHERE userName = ?",
+    [userName],
+    (err, result) => {
+      if (err) return callback(err, null);
+      callback(null, result); // มี result.affectedRows
+    }
+  );
 };
-
 
 const getUser = (userName, callback) => {
-    db.query("SELECT * FROM users WHERE userName = ?", [userName], (err, results) => {
-        if (err) return callback(err, null);
-        callback(null, results[0]); // คืนแถวแรก
-    });
+  db.query(
+    "SELECT * FROM users WHERE userName = ?",
+    [userName],
+    (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results[0]); // คืนแถวแรก
+    }
+  );
 };
 
-
-const updatesUser = (userName, updates) => {
+const updateUser = (userName, updates) => {
   return new Promise((resolve, reject) => {
-    const allowedFields = ["userName", "fName", "lName", "password", "age", "height", "weight", "diseases", "sex", "BMI"];
+    const allowedFields = [
+      "userName",
+      "fName",
+      "lName",
+      "password",
+      "age",
+      "height",
+      "weight",
+      "diseases",
+      "sex",
+      "BMI",
+    ];
     const fields = [];
     const values = [];
 
@@ -48,11 +86,9 @@ const updatesUser = (userName, updates) => {
   });
 };
 
-
-
 module.exports = {
-    createUser,
-    deleteUser,
-    getUser,
-    updatesUser
+  createUser,
+  deleteUser,
+  getUser,
+  updateUser,
 };

@@ -1,36 +1,69 @@
-import { useState } from 'react'
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function UserManagement() {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Jane Doe',
-    email: 'jane@example.com',
-    role: 'Member',
-    status: 'Active',
-  })
+    userName: "",
+    fName: "",
+    lName: "",
+    password: "",
+    age: "",
+    height: "",
+    weight: "",
+    diseases: "",
+    sex: "",
+    BMI: "",
+  });
 
-  const [draft, setDraft] = useState(profile)
+  const [draft, setDraft] = useState({ ...profile });
+  const userName = localStorage.getItem("userName");
+  const hiddenFields = ["id", "password"];
+
+  useEffect(() => {
+    if (userName) {
+      axios
+        .get(`http://localhost:1234/users/${userName}`)
+        .then((res) => {
+          setProfile(res.data);
+          setDraft({ ...res.data }); // important: clone
+        })
+        .catch((err) => {
+          console.error("Failed to fetch user:", err);
+        });
+    }
+  }, [userName]);
 
   const handleStartEdit = () => {
-    setDraft(profile)
-    setIsEditing(true)
-  }
+    setDraft({ ...profile }); // clone
+    setIsEditing(true);
+  };
 
   const handleCancel = () => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setDraft((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setDraft((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const handleSave = (e) => {
-    e.preventDefault()
-    setProfile(draft)
-    setIsEditing(false)
-    alert('Profile updated (mock only – connect to backend later).')
-  }
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.put(`http://localhost:1234/users/${userName}`, draft);
+
+      setProfile({ ...draft }); // update UI
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Failed to update profile.");
+    }
+  };
 
   return (
     <div className="page">
@@ -42,32 +75,14 @@ export default function UserManagement() {
       <div className="card surface">
         {!isEditing ? (
           <div className="profile-view">
-            <div className="profile-row">
-              <span className="profile-label">Name</span>
-              <span className="profile-value">{profile.name}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-label">Email</span>
-              <span className="profile-value">{profile.email}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-label">Role</span>
-              <span className="profile-value">{profile.role}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-label">Status</span>
-              <span className="profile-value">
-                <span
-                  className={
-                    profile.status === 'Active'
-                      ? 'badge badge-active'
-                      : 'badge badge-suspended'
-                  }
-                >
-                  {profile.status}
-                </span>
-              </span>
-            </div>
+            {Object.entries(profile)
+              .filter(([key]) => !hiddenFields.includes(key))
+              .map(([key, value]) => (
+                <div className="profile-row" key={key}>
+                  <span className="profile-label">{key}</span>
+                  <span className="profile-value">{value}</span>
+                </div>
+              ))}
 
             <div className="profile-actions">
               <button type="button" className="btn" onClick={handleStartEdit}>
@@ -77,66 +92,49 @@ export default function UserManagement() {
           </div>
         ) : (
           <form className="profile-form" onSubmit={handleSave}>
-            <div className="profile-row">
-              <label className="profile-label" htmlFor="name">
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={draft.name}
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
+            {Object.entries(draft)
+              .filter(([key]) => !hiddenFields.includes(key))
+              .map(([key, value]) => (
+                <div className="profile-row" key={key}>
+                  <label className="profile-label" htmlFor={key}>
+                    {key}
+                  </label>
 
-            <div className="profile-row">
-              <label className="profile-label" htmlFor="email">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={draft.email}
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
-
-            <div className="profile-row">
-              <label className="profile-label" htmlFor="role">
-                Role
-              </label>
-              <input
-                id="role"
-                name="role"
-                type="text"
-                value={draft.role}
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
-
-            <div className="profile-row">
-              <label className="profile-label" htmlFor="status">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={draft.status}
-                onChange={handleChange}
-                className="input"
-              >
-                <option value="Active">Active</option>
-                <option value="Suspended">Suspended</option>
-              </select>
-            </div>
+                  {key === "sex" ? (
+                    <select
+                      id={key}
+                      name={key}
+                      value={value}
+                      onChange={handleChange}
+                      className="input"
+                    >
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                  ) : (
+                    <input
+                      id={key}
+                      name={key}
+                      type={
+                        ["age", "height", "weight", "BMI"].includes(key)
+                          ? "number"
+                          : "text"
+                      }
+                      value={value}
+                      onChange={handleChange}
+                      className="input"
+                    />
+                  )}
+                </div>
+              ))}
 
             <div className="profile-actions">
-              <button type="button" className="btn ghost" onClick={handleCancel}>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={handleCancel}
+              >
                 Cancel
               </button>
               <button type="submit" className="btn">
@@ -147,5 +145,5 @@ export default function UserManagement() {
         )}
       </div>
     </div>
-  )
+  );
 }
