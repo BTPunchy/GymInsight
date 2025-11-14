@@ -200,7 +200,7 @@ const getTrainerClients = (trainerId) => {
       SELECT DISTINCT u.id, u.userName, u.fName, u.lName, u.age, u.weight, u.height, u.sex, u.diseases,
         (SELECT COUNT(*) FROM booking WHERE user_id = u.id AND trainer_id = ?) as total_bookings,
         (SELECT COUNT(*) FROM sessions WHERE client_id = u.id AND trainer_id = ?) as completed_sessions,
-        (SELECT COUNT(*) FROM booking WHERE user_id = u.id AND trainer_id = ? AND status = 'comfirm' AND date >= CURDATE()) as upcoming_bookings,
+        (SELECT COUNT(*) FROM booking WHERE user_id = u.id AND trainer_id = ? AND status = 'comfirmed' AND date >= CURDATE()) as upcoming_bookings,
         (SELECT MIN(date) FROM booking WHERE user_id = u.id AND trainer_id = ?) as first_booking,
         (SELECT MAX(date) FROM booking WHERE user_id = u.id AND trainer_id = ?) as last_booking
       FROM users u
@@ -284,7 +284,7 @@ const getUpcomingBookingsCount = (trainerId) => {
     const sql = `
       SELECT COUNT(*) as count
       FROM booking
-      WHERE trainer_id = ? AND status = 'comfirm' AND date >= CURDATE()
+      WHERE trainer_id = ? AND status = 'comfirmed' AND date >= CURDATE()
     `;
     db.query(sql, [trainerId], (err, results) => {
       if (err) return reject(err);
