@@ -44,14 +44,14 @@ export default function Navbar() {
           <Link className={isActive("/booking")} to="/booking">
             Booking
           </Link>
-          <Link
+          {/* <Link
             className={
               pathname.startsWith("/trainers") ? "link active" : "link"
             }
             to="/trainers"
           >
             Trainer
-          </Link>
+          </Link> */}
 
           {userData ? (
             <>

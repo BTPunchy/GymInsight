@@ -1,38 +1,38 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const SERVICE_ITEMS = [
   {
-    id: 'yoga',
-    title: 'Yoga Room',
-    desc: 'Calm space for yoga, stretching and breath work.',
+    id: "yoga",
+    title: "Yoga Room",
+    desc: "Calm space for yoga, stretching and breath work.",
   },
   {
-    id: 'pilates',
-    title: 'Pilates Room',
-    desc: 'Reformer & mat pilates for posture and rehab.',
+    id: "pilates",
+    title: "Pilates Room",
+    desc: "Reformer & mat pilates for posture and rehab.",
   },
   {
-    id: 'dance',
-    title: 'Dance Fitness',
-    desc: 'High-energy studio for dance and group classes.',
+    id: "dance",
+    title: "Dance Fitness",
+    desc: "High-energy studio for dance and group classes.",
   },
-]
+];
 
-const TIME_SLOTS = ['07:00', '09:00', '11:30', '14:00', '16:30', '18:00']
+const TIME_SLOTS = ["07:00", "09:00", "11:30", "14:00", "16:30", "18:00"];
 
 export default function Home() {
-  const [activeService, setActiveService] = useState(SERVICE_ITEMS[0].id)
-  const [activeTime, setActiveTime] = useState(TIME_SLOTS[1])
+  const [activeService, setActiveService] = useState(SERVICE_ITEMS[0].id);
+  const [activeTime, setActiveTime] = useState(TIME_SLOTS[1]);
 
-  const selectedService = SERVICE_ITEMS.find((s) => s.id === activeService)
+  const selectedService = SERVICE_ITEMS.find((s) => s.id === activeService);
 
   const handleBookNow = () => {
     // ตอนนี้ให้แค่ mock ไว้ก่อน เผื่อเดี๋ยวไปต่อกับ backend
     alert(
-      `Booked ${selectedService.title} at ${activeTime} (mock UI – ไว้ต่อ backend ทีหลัง)`,
-    )
-  }
+      `Booked ${selectedService.title} at ${activeTime} (mock UI – ไว้ต่อ backend ทีหลัง)`
+    );
+  };
 
   return (
     <div className="home">
@@ -46,18 +46,14 @@ export default function Home() {
             STARTS HERE.
           </h1>
           <p className="subhead">
-            Simple booking. Powerful results. Reserve rooms, book trainers,
-            and manage your schedule in one place.
+            Simple booking. Powerful results. Reserve rooms, book trainers, and
+            manage your schedule in one place.
           </p>
 
           <div className="cta-row">
             <Link to="/reserve" className="chip green">
               Reserve Room
             </Link>
-            <span className="or">or</span>
-            <a className="chip pink" href="#service">
-              Book your personal trainer
-            </a>
           </div>
         </div>
 
@@ -106,8 +102,8 @@ export default function Home() {
                 type="button"
                 className={
                   s.id === activeService
-                    ? 'service-row service-row-active'
-                    : 'service-row'
+                    ? "service-row service-row-active"
+                    : "service-row"
                 }
                 onClick={() => setActiveService(s.id)}
               >
@@ -143,7 +139,9 @@ export default function Home() {
                   key={t}
                   type="button"
                   className={
-                    t === activeTime ? 'time-slot time-slot-active' : 'time-slot'
+                    t === activeTime
+                      ? "time-slot time-slot-active"
+                      : "time-slot"
                   }
                   onClick={() => setActiveTime(t)}
                 >
@@ -161,11 +159,11 @@ export default function Home() {
             </button>
 
             <p className="schedule-footer">
-              Need more options? Go to{' '}
+              Need more options? Go to{" "}
               <Link to="/booking" className="inline-link">
                 Booking
-              </Link>{' '}
-              or{' '}
+              </Link>{" "}
+              or{" "}
               <Link to="/reserve" className="inline-link">
                 full room reservation
               </Link>
@@ -176,7 +174,7 @@ export default function Home() {
       </section>
 
       {/* TRAINER SECTION */}
-      <section id="trainer" className="section trainer-section">
+      {/* <section id="trainer" className="section trainer-section">
         <div className="section-header">
           <h2>Personal Trainers</h2>
           <p>Choose the right coach for strength, conditioning, or recovery.</p>
@@ -199,21 +197,21 @@ export default function Home() {
             desc="High-energy sessions focused on fat burn."
           />
         </div>
-      </section>
+      </section> */}
     </div>
-  )
+  );
 }
 
-function TrainerCard({ name, tag, desc }) {
-  return (
-    <div className="trainer-card">
-      <div className="trainer-avatar" />
-      <h3>{name}</h3>
-      <p className="trainer-tag">{tag}</p>
-      <p className="trainer-desc">{desc}</p>
-      <button type="button" className="btn-xs">
-        Book session
-      </button>
-    </div>
-  )
-}
+// function TrainerCard({ name, tag, desc }) {
+//   return (
+//     <div className="trainer-card">
+//       <div className="trainer-avatar" />
+//       <h3>{name}</h3>
+//       <p className="trainer-tag">{tag}</p>
+//       <p className="trainer-desc">{desc}</p>
+//       <button type="button" className="btn-xs">
+//         Book session
+//       </button>
+//     </div>
+//   );
+// }
