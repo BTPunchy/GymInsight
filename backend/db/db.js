@@ -1,5 +1,4 @@
 const mysql = require("mysql");
-
 const db = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -22,66 +21,66 @@ CREATE TABLE IF NOT EXISTS users (
   height SMALLINT UNSIGNED NOT NULL,
   weight DECIMAL(5,2) NOT NULL,
   diseases VARCHAR(255),
+  
   sex ENUM('male', 'female', 'other') NOT NULL,
   BMI DECIMAL(5,2) NOT NULL
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE IF NOT EXISTS trainers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   expertise VARCHAR(255),
-  experience TEXT,
-  bio TEXT,
-  rating DECIMAL(3,2),
   FOREIGN KEY (user_id) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE IF NOT EXISTS rooms (
-  rid INT AUTO_INCREMENT PRIMARY KEY,
+  rid INT PRIMARY KEY AUTO_INCREMENT,
   description TEXT NOT NULL,
-  room_type VARCHAR(50) NOT NULL,
+  room_type ENUM('yoga', 'pilates', 'dance') NOT NULL,
   gender_type ENUM('male', 'female', 'unspecified') DEFAULT 'unspecified',
-  status ENUM('available', 'occupied', 'maintenance') NOT NULL DEFAULT 'available'
-) ENGINE=InnoDB;
+  status ENUM('available', 'occupied', 'maintenance') NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS time_slots (
+  slot_id INT PRIMARY KEY AUTO_INCREMENT,
+  time_start TIME NOT NULL,
+  time_end TIME NOT NULL
+);
+
+INSERT INTO time_slots (time_start, time_end) VALUES
+('07:00:00', '08:30:00'),
+('09:00:00', '10:30:00'),
+('11:30:00', '13:00:00'),
+('14:00:00', '15:30:00'),
+('16:30:00', '17:30:00'),
+('18:00:00', '19:30:00');
 
 CREATE TABLE IF NOT EXISTS booking (
-  booking_id INT AUTO_INCREMENT PRIMARY KEY,
+  booking_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   rid INT,
   trainer_id INT,
   date DATE NOT NULL,
-  time_start TIME NOT NULL,
-  time_end TIME NOT NULL,
-  status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
-  notes TEXT,
+  slot_id INT NOT NULL,
+  status ENUM('pending', 'confirm', 'cancelled') DEFAULT 'pending',
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (rid) REFERENCES rooms(rid),
-  FOREIGN KEY (trainer_id) REFERENCES trainers(id)
-) ENGINE=InnoDB;
+  FOREIGN KEY (trainer_id) REFERENCES trainers(id),
+  FOREIGN KEY (slot_id) REFERENCES time_slots(slot_id)
+);
 
-CREATE TABLE IF NOT EXISTS sessions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  booking_id INT,
-  client_id INT NOT NULL,
-  trainer_id INT NOT NULL,
-  date DATE NOT NULL,
-  time_start TIME NOT NULL,
-  time_end TIME NOT NULL,
-  duration INT NOT NULL,              -- นาที หรือชั่วโมงแล้วแต่ดีไซน์
-  notes TEXT,
-  completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (booking_id) REFERENCES booking(booking_id),
-  FOREIGN KEY (client_id) REFERENCES users(id),
-  FOREIGN KEY (trainer_id) REFERENCES trainers(id)
-) ENGINE=InnoDB;
-`;
+INSERT INTO rooms (description, room_type, gender_type, status) VALUES
+('Peaceful yoga space with natural light', 'yoga', 'female', 'available'),
+('Pilates room with reformer machines', 'pilates', 'unspecified', 'available'),
+('Dance studio with mirrors and sound system', 'dance', 'male', 'available');
+`
+
 
 db.connect((err) => {
-  if (err) throw err;
-  db.query(initSQL, (err) => {
     if (err) throw err;
-    console.log("Database and tables initialized");
+    db.query(initSQL, (err) => {
+      if (err) throw err;
+      console.log(" Database and tables initialized");
+    });
   });
-});
-
 module.exports = db;
