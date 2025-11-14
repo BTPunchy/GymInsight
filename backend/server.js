@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const PORT = 1234;
 
 app.use("/users", userRoute);
-app.use("/rooms", gymRoute);
+app.use("/gyms", gymRoute);
 
 server.listen(PORT, () => {
   console.log(`In the beninging on port http://localhost:${PORT}`);

@@ -19,7 +19,25 @@ const getRoomByUser = (user_id) => {
   });
 };
 
-const createBookingRooms = (user_id, rid, trainer_id, date, time_start, time_end, status) => {
+const getRoomByType = (type) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM rooms WHERE room_type = ?";
+    db.query(sql, [type], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+};
+
+const createBookingRooms = (
+  user_id,
+  rid,
+  trainer_id,
+  date,
+  time_start,
+  time_end,
+  status
+) => {
   return new Promise((resolve, reject) => {
     const sql = `
       INSERT INTO booking (user_id, rid, trainer_id, date, time_start, time_end, status)
@@ -27,7 +45,15 @@ const createBookingRooms = (user_id, rid, trainer_id, date, time_start, time_end
     `;
     db.query(
       sql,
-      [user_id, rid || null, trainer_id || null, date, time_start, time_end, status || 'Pending'],
+      [
+        user_id,
+        rid || null,
+        trainer_id || null,
+        date,
+        time_start,
+        time_end,
+        status || "Pending",
+      ],
       (err, result) => {
         if (err) return reject(err);
         resolve(result);
@@ -57,9 +83,10 @@ const deleteBookingRooms = (booking_id) => {
 };
 
 module.exports = {
-    getRooms,
-    getRoomByUser,
-    createBookingRooms,
-    deleteBookingRooms,
-    updatedBookingRoomStatus
-}
+  getRooms,
+  getRoomByUser,
+  createBookingRooms,
+  deleteBookingRooms,
+  updatedBookingRoomStatus,
+  getRoomByType,
+};

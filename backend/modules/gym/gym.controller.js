@@ -30,6 +30,21 @@ const getRooms = async (req, res) => {
   }
 };
 
+const getRoomsByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+
+    if (!type) {
+      return res.status(400).json({ success: false, message: "Missing type" });
+    }
+
+    const rooms = await gymService.getRoomByTypeService(type);
+    res.status(200).json({ success: true, data: rooms });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 const getRoomByUser = async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -105,5 +120,6 @@ module.exports = {
   createBookingRooms,
   getRoomByUser,
   updatedBookingRoomStatus,
-  deleteBookingRooms
+  deleteBookingRooms,
+  getRoomsByType
 };

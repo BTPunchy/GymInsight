@@ -5,6 +5,8 @@ import Signin from "./pages/signin.jsx";
 import Services from "./pages/services.jsx";
 import RoomReservation from "./pages/roomReservation.jsx";
 import TrainerSelection from "./pages/trainer.jsx";
+import { RoomInfo } from "./pages/roomInfo.jsx";
+import { BookingRooms } from "./pages/bookingRooms.jsx";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/rooms" element={<RoomReservation />} />
         <Route path="/service" element={<Services />} />
         <Route path="/trainer" element={<TrainerSelection />} />
+        <Route path="/rooms/:roomType" element={<RoomInfo />} />
+        <Route path="/rooms/:roomType/booking" element={<BookingRooms />} />
       </Routes>
     </Router>
   );

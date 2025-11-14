@@ -20,17 +20,19 @@ export default function RoomReservation() {
     {
       title: "YOGA ROOM",
       image: "/images/yoga-room.jpg",
+      slug: "yoga",
     },
     {
       title: "PILATES ROOM",
       image: "/images/pilates-room.jpg",
+      slug: "pilates",
     },
     {
       title: "DANCE FITNESS ROOM",
       image: "/images/dance-room.jpg",
+      slug: "dance",
     },
   ];
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -46,11 +48,7 @@ export default function RoomReservation() {
           <div key={room.title} className="text-center">
             <div
               className="cursor-pointer rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
-              onClick={() =>
-                (window.location.href = `/rooms/${room.title
-                  .toLowerCase()
-                  .replace(/ /g, "-")}`)
-              }
+              onClick={() => (window.location.href = `/rooms/${room.slug}`)}
             >
               <img
                 src={room.image}
