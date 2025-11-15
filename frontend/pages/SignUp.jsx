@@ -63,7 +63,7 @@ export default function SignUp() {
       });
 
       console.log("Signup success:", res.data);
-      navigate("/");
+      navigate("/signin");
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
       console.error("Signup error:", err);

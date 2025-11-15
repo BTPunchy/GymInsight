@@ -5,8 +5,7 @@ const createBookingRoomsService = async (
   rid,
   trainer_id,
   date,
-  time_start,
-  time_end,
+  time_slot,
   status
 ) => {
   try {
@@ -15,10 +14,17 @@ const createBookingRoomsService = async (
       rid,
       trainer_id,
       date,
-      time_start,
-      time_end,
+      time_slot,
       status
     );
+
+    if (result) {
+      // ถ้า booking สำเร็จและสถานะเป็น confirm ให้เปลี่ยนสถานะห้องเป็น occupied
+      if (status === "confirm" && rid) {
+        await gymModel.updatedRoomStatus(rid, "occupied");
+      }
+    }
+
     return result;
   } catch (err) {
     throw err;
@@ -47,9 +53,27 @@ const getRoomByIDService = async (user_id) => {
   }
 };
 
+const getRoomByTypeService = async (room_type) => {
+  try {
+    const room = await gymModel.getRoomByType(room_type);
+    return room;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const updatedBookingRoomStatusService = async (booking_id, status) => {
   try {
     const result = await gymModel.updatedBookingRoomStatus(booking_id, status);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const updatedRoomStatus = async (rid, status) => {
+  try {
+    const result = await gymModel.updatedRoomStatus(rid, status);
     return result;
   } catch (err) {
     throw err;
@@ -72,4 +96,6 @@ module.exports = {
   updatedBookingRoomStatusService,
   deleteBookingRoomsService,
   getRoomByIDService,
+  getRoomByTypeService,
+  updatedRoomStatus,
 };

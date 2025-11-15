@@ -3,14 +3,12 @@ const { createRoom } = require("./gym.model");
 
 const createBookingRooms = async (req, res) => {
   try {
-    const { user_id, rid, trainer_id, date, time_start, time_end, status } =
-      req.body;
+    const { user_id, rid, trainer_id, date, time_slot, status } = req.body;
 
-    if (!user_id || !date || !time_start || !time_end) {
+    if (!user_id || !date || !time_slot) {
       return res.status(400).json({
         success: false,
-        message:
-          "Missing required fields: user_id, date, time_start, or time_end",
+        message: "Missing required fields: user_id, date, or time_slot",
       });
     }
 
@@ -19,10 +17,11 @@ const createBookingRooms = async (req, res) => {
       rid,
       trainer_id,
       date,
-      time_start,
-      time_end,
+      time_slot,
       status
     );
+
+    await gymService.updatedRoomStatus(rid, "occupied");
 
     res.status(201).json({
       success: true,
@@ -65,6 +64,16 @@ const getRoomByID = async (req, res) => {
   try {
     const { user_id } = req.params;
     const room = await gymService.getRoomByIDService(user_id);
+    res.status(200).json({ success: true, data: room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getRoomByType = async (req, res) => {
+  try {
+    const { room_type } = req.params;
+    const room = await gymService.getRoomByTypeService(room_type);
     res.status(200).json({ success: true, data: room });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -127,6 +136,33 @@ const deleteBookingRooms = async (req, res) => {
   }
 };
 
+const updatedRoomStatus = async (req, res) => {
+  try {
+    const { room_id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing status field",
+      });
+    }
+
+    const result = await gymService.updatedRoomStatus(room_id, status);
+
+    res.status(200).json({
+      success: true,
+      message: "Room status updated successfully",
+      data: result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   getRooms,
   createBookingRooms,
@@ -134,4 +170,6 @@ module.exports = {
   updatedBookingRoomStatus,
   deleteBookingRooms,
   getRoomByID,
+  getRoomByType,
+  updatedRoomStatus,
 };

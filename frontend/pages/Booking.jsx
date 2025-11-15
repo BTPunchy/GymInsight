@@ -68,9 +68,15 @@ export default function Booking() {
     });
   }
 
-  function cancelBooking(bookingId) {
+  function cancelBooking(bookingId, rid) {
     axios
       .delete(`http://localhost:1234/rooms/bookings/${bookingId}`)
+      .then(() => {
+        // อัปเดตสถานะห้องเป็น available
+        return axios.put(`http://localhost:1234/rooms/${rid}/status`, {
+          status: "available",
+        });
+      })
       .then(() => {
         const updatedBookings = bookings.filter(
           (b) => b.booking_id !== bookingId
@@ -78,9 +84,10 @@ export default function Booking() {
         setBookings(updatedBookings);
       })
       .catch((err) => {
-        console.error("Error cancelling booking:", err);
+        console.error("Error cancelling booking or updating room status:", err);
       });
   }
+
   function mapRoomType(type) {
     const map = {
       yoga: "Yoga",
@@ -145,7 +152,7 @@ export default function Booking() {
                     <button
                       type="button"
                       className="btn-xs ghost btn-red"
-                      onClick={() => cancelBooking(b.booking_id)}
+                      onClick={() => cancelBooking(b.booking_id, b.rid)}
                     >
                       Cancel
                     </button>

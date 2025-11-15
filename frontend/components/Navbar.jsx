@@ -38,11 +38,6 @@ export default function Navbar() {
           <Link className={isActive("/")} to="/">
             Home
           </Link>
-          <Link className={isActive("/")} to="/">
-            <a className="link" href="#service">
-              Service
-            </a>
-          </Link>
 
           <Link className={isActive("/booking")} to="/booking">
             Booking
