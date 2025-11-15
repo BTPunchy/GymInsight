@@ -8,7 +8,7 @@ function TimeSlotCard({ timeSlot, status, onBook }) {
 
   return (
     <div className="border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-      <p className="text-lg font-medium text-gray-800">{timeSlot}</p>
+      <p className="text-lg font-medium text-white">{timeSlot}</p>
       <button
         disabled={isOccupied}
         onClick={() => onBook(timeSlot)}
@@ -88,7 +88,7 @@ export default function YogaRoom() {
       {/* ซ้าย */}
       <div className="md:w-1/2 space-y-4">
         <img src={yogaImg} alt="Yoga Room" className="rounded-lg shadow-md" />
-        <p className="text-gray-700">
+        <p className="text-white-700">
           A peaceful yoga space with natural light, mats, and calming ambiance.
         </p>
       </div>
